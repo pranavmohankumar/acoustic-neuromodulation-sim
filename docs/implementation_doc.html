@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project #5 Implementation Document - Acoustic-Neuromodulation Co-Simulation Platform</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #0f172a; font-size: 24px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #1e40af; font-size: 18px; margin-top: 25px; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; margin-bottom: 15px; }
+        .box { background: #f1f5f9; border-left: 4px solid #3b82f6; padding: 15px; margin: 15px 0; border-radius: 0 6px 6px 0; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        pre { background: #0f172a; color: #f8fafc; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+        footer { margin-top: 40px; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="badge">Project #5 Specification</span>
+        <h1>Acoustic-Neuromodulation Co-Simulation Platform</h1>
+        <p><strong>Target Industry Profile:</strong> Insightec, Focused Ultrasound (FUS) Startups</p>
+        
+        <h2>1. System Architecture & Concept</h2>
+        <div class="box">
+            <p>2D Finite-Difference Time-Domain (FDTD) wave propagation solver coupled with Poisson bio-heat and acoustic pressure attenuation models.</p>
+        </div>
+
+        <h2>2. Synthetic Bio-Data Engineering Strategy</h2>
+        <p>Multi-layer skull/brain acoustic impedance and density grid map with sound speed variations.</p>
+
+        <h2>3. Low-End LLM Prompt & Module Blueprint</h2>
+        <ul>
+            <li><strong>Module 1: Acoustic Voxel Grid Builder:</strong> Construct 2D spatial grid modeling bone, gray matter, and CSF tissue properties.</li>
+            <li><strong>Module 2: FDTD Acoustic Wave Engine:</strong> Solve 2D pressure wave propagation equation for focused ultrasound transducer array.</li>
+            <li><strong>Module 3: Thermal & Pressure Hotspot Mapper:</strong> Compute focal point acoustic intensity and steady-state bio-heat distribution.</li>
+        </ul>
+
+        <h2>4. Core Technical Starter Skeleton</h2>
+        <pre><code>import numpy as np
+
+def simulate_fdtd_wave_2d(grid_size=(100, 100), steps=200):
+    p = np.zeros(grid_size)
+    p_prev = np.zeros(grid_size)
+    c = np.ones(grid_size) * 1500.0 # Speed of sound m/s
+    c[40:60, :] = 2800.0 # Skull bone barrier
+    
+    dt = 1e-6
+    dx = 1e-3
+    
+    for t in range(steps):
+        laplacian = (np.pad(p[1:, :], ((0,1),(0,0))) + np.pad(p[:-1, :], ((1,0),(0,0))) +
+                     np.pad(p[:, 1:], ((0,0),(0,1))) + np.pad(p[:, :-1], ((0,0),(1,0))) - 4*p) / (dx**2)
+        p_next = 2*p - p_prev + (c**2) * (dt**2) * laplacian
+        p_prev = p.copy()
+        p = p_next.copy()
+        p[10, 50] = np.sin(2 * np.pi * 500e3 * t * dt) # Source
+    return p
+</code></pre>
+
+        <footer>
+            <p>Neurotech Technical Blueprint | Prepared for Pranav Mohankumar | UIUC Neural Engineering</p>
+        </footer>
+    </div>
+</body>
+</html>
